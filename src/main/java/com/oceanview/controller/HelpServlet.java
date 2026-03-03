@@ -1,0 +1,19 @@
+package com.oceanview.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+/**
+ * Help page controller.
+ */
+@WebServlet("/help")
+public class HelpServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/views/help.jsp").forward(request, response);
+    }
+}

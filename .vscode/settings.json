@@ -1,0 +1,11 @@
+{
+    "java.project.referencedLibraries": [
+        "src/main/webapp/WEB-INF/lib/activation-1.1.1.jar",
+        "src/main/webapp/WEB-INF/lib/gson-2.10.1.jar",
+        "src/main/webapp/WEB-INF/lib/itextpdf-5.5.13.3.jar",
+        "src/main/webapp/WEB-INF/lib/javax.mail-1.6.2.jar",
+        "src/main/webapp/WEB-INF/lib/jbcrypt-0.4.jar",
+        "src/main/webapp/WEB-INF/lib/mysql-connector-j-8.3.0.jar",
+        "src/main/webapp/WEB-INF/lib/servlet-api-4.0.1.jar"
+    ]
+}
