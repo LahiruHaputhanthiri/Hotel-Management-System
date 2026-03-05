@@ -32,6 +32,8 @@ public class ReservationService {
             String roomType, Date checkIn, Date checkOut, int numGuests,
             String specialRequests, String userEmail) {
 
+        System.out.println("DEBUG: ReservationService.createReservation for " + guestName + " (" + roomType + ")");
+
         // Validate dates
         if (checkOut.before(checkIn) || checkOut.equals(checkIn)) {
             return "Check-out date must be after check-in date.";

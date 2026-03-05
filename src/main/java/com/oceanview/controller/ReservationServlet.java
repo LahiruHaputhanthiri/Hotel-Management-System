@@ -202,10 +202,10 @@ public class ReservationServlet extends HttpServlet {
                 showBookingForm(request, response);
             }
 
-        } catch (Exception e) {
-            System.err.println("CRITICAL ERROR in createReservation: " + e.getMessage());
-            e.printStackTrace();
-            request.setAttribute("error", "An internal server error occurred: " + e.getMessage());
+        } catch (Throwable t) {
+            System.err.println("CRITICAL ERROR in createReservation: " + t.getMessage());
+            t.printStackTrace();
+            request.setAttribute("error", "An internal server error occurred: " + t.getMessage());
             showBookingForm(request, response);
         }
     }

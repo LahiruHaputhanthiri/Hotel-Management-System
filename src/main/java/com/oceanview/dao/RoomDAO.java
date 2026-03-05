@@ -271,10 +271,26 @@ public class RoomDAO {
         Room room = new Room();
         room.setId(rs.getInt("id"));
         room.setRoomNumber(rs.getString("room_number"));
-        room.setRoomType(Room.RoomType.valueOf(rs.getString("room_type")));
+        String roomTypeStr = rs.getString("room_type");
+        if (roomTypeStr != null) {
+            try {
+                room.setRoomType(Room.RoomType.valueOf(roomTypeStr.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                room.setRoomType(Room.RoomType.STANDARD);
+            }
+        }
+
         room.setPricePerNight(rs.getDouble("price_per_night"));
         room.setCapacity(rs.getInt("capacity"));
-        room.setStatus(Room.RoomStatus.valueOf(rs.getString("status")));
+
+        String statusStr = rs.getString("status");
+        if (statusStr != null) {
+            try {
+                room.setStatus(Room.RoomStatus.valueOf(statusStr.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                room.setStatus(Room.RoomStatus.AVAILABLE);
+            }
+        }
         room.setDescription(rs.getString("description"));
         room.setImageUrl(rs.getString("image_url"));
         room.setFloor(rs.getInt("floor"));
