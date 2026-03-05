@@ -137,49 +137,58 @@ public class AuthServlet extends HttpServlet {
     private void handleRegister(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirmPassword");
-        String fullName = request.getParameter("fullName");
-        String phone = request.getParameter("phone");
+        try {
+            String username = request.getParameter("username");
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            String confirmPassword = request.getParameter("confirmPassword");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
 
-        // Validate
-        if (ValidationUtil.isEmpty(username) || ValidationUtil.isEmpty(email) ||
-                ValidationUtil.isEmpty(password) || ValidationUtil.isEmpty(fullName)) {
-            setRegisterError(request, response, "Please fill in all required fields.");
-            return;
-        }
-        if (!ValidationUtil.isValidUsername(username)) {
-            setRegisterError(request, response, "Username must be 3-30 characters, alphanumeric and underscores only.");
-            return;
-        }
-        if (!ValidationUtil.isValidEmail(email)) {
-            setRegisterError(request, response, "Please enter a valid email address.");
-            return;
-        }
-        if (!PasswordUtil.isStrongPassword(password)) {
-            setRegisterError(request, response,
-                    "Password must be 8+ characters with uppercase, lowercase, number, and special character.");
-            return;
-        }
-        if (!password.equals(confirmPassword)) {
-            setRegisterError(request, response, "Passwords do not match.");
-            return;
-        }
-        if (phone != null && !phone.isEmpty() && !ValidationUtil.isValidPhone(phone)) {
-            setRegisterError(request, response, "Please enter a valid phone number.");
-            return;
-        }
+            // Validate
+            if (ValidationUtil.isEmpty(username) || ValidationUtil.isEmpty(email) ||
+                    ValidationUtil.isEmpty(password) || ValidationUtil.isEmpty(fullName)) {
+                setRegisterError(request, response, "Please fill in all required fields.");
+                return;
+            }
+            if (!ValidationUtil.isValidUsername(username)) {
+                setRegisterError(request, response,
+                        "Username must be 3-30 characters, alphanumeric and underscores only.");
+                return;
+            }
+            if (!ValidationUtil.isValidEmail(email)) {
+                setRegisterError(request, response, "Please enter a valid email address.");
+                return;
+            }
+            if (!PasswordUtil.isStrongPassword(password)) {
+                setRegisterError(request, response,
+                        "Password must be 8+ characters with uppercase, lowercase, number, and special character.");
+                return;
+            }
+            if (!password.equals(confirmPassword)) {
+                setRegisterError(request, response, "Passwords do not match.");
+                return;
+            }
+            if (phone != null && !phone.isEmpty() && !ValidationUtil.isValidPhone(phone)) {
+                setRegisterError(request, response, "Please enter a valid phone number.");
+                return;
+            }
 
-        String result = userService.register(username, email, password, fullName, phone);
+            String result = userService.register(username, email, password, fullName, phone);
 
-        if ("SUCCESS".equals(result)) {
-            request.setAttribute("success", "Registration successful! Please check your email to verify your account.");
-            request.setAttribute("csrfToken", CSRFTokenUtil.generateToken(request));
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
-        } else {
-            setRegisterError(request, response, result);
+            if ("SUCCESS".equals(result)) {
+                request.setAttribute("success",
+                        "Registration successful! Please check your email to verify your account.");
+                request.setAttribute("csrfToken", CSRFTokenUtil.generateToken(request));
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
+            } else {
+                setRegisterError(request, response, result);
+            }
+        } catch (Throwable t) {
+            System.err.println("CRITICAL ERROR in handleRegister: " + t.getMessage());
+            t.printStackTrace();
+            request.setAttribute("error", "An internal error occurred during registration: " + t.getMessage());
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
         }
     }
 

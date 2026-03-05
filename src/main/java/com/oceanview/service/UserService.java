@@ -45,8 +45,9 @@ public class UserService {
             // Send verification email
             try {
                 EmailUtil.sendVerificationEmail(email, username, token);
-            } catch (Exception e) {
-                System.err.println("Email sending failed, but user was created: " + e.getMessage());
+            } catch (Throwable t) {
+                System.err.println("CRITICAL: Email sending failed: " + t.getMessage());
+                t.printStackTrace();
             }
             return "SUCCESS";
         }
@@ -129,8 +130,8 @@ public class UserService {
         if (userDAO.setResetToken(user.getId(), token)) {
             try {
                 EmailUtil.sendPasswordReset(email, user.getUsername(), token);
-            } catch (Exception e) {
-                return "Failed to send reset email.";
+            } catch (Throwable t) {
+                return "Failed to send reset email: " + t.getMessage();
             }
             return "SUCCESS";
         }
