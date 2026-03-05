@@ -74,7 +74,12 @@ public class ReservationServlet extends HttpServlet {
 
         switch (pathInfo) {
             case "/create":
-                createReservation(request, response, currentUser);
+                if (currentUser == null) {
+                    System.err.println("Reservation Error: No user in session");
+                    response.sendRedirect(request.getContextPath() + "/login.jsp");
+                } else {
+                    createReservation(request, response, currentUser);
+                }
                 break;
             case "/updateStatus":
                 updateStatus(request, response, currentUser);
@@ -152,44 +157,55 @@ public class ReservationServlet extends HttpServlet {
     private void createReservation(HttpServletRequest request, HttpServletResponse response, User currentUser)
             throws ServletException, IOException {
 
-        String guestName = request.getParameter("guestName");
-        String address = request.getParameter("address");
-        String contactNumber = request.getParameter("contactNumber");
-        String roomType = request.getParameter("roomType");
-        String checkInStr = request.getParameter("checkIn");
-        String checkOutStr = request.getParameter("checkOut");
-        String numGuestsStr = request.getParameter("numGuests");
-        String specialRequests = request.getParameter("specialRequests");
+        System.out.println("DEBUG: Starting createReservation for user: "
+                + (currentUser != null ? currentUser.getUsername() : "NULL"));
 
-        // Validate
-        if (ValidationUtil.isEmpty(guestName) || ValidationUtil.isEmpty(contactNumber) ||
-                ValidationUtil.isEmpty(roomType) || ValidationUtil.isEmpty(checkInStr)
-                || ValidationUtil.isEmpty(checkOutStr)) {
-            request.setAttribute("error", "Please fill in all required fields.");
-            showBookingForm(request, response);
-            return;
-        }
+        try {
+            String guestName = request.getParameter("guestName");
+            String address = request.getParameter("address");
+            String contactNumber = request.getParameter("contactNumber");
+            String roomType = request.getParameter("roomType");
+            String checkInStr = request.getParameter("checkIn");
+            String checkOutStr = request.getParameter("checkOut");
+            String numGuestsStr = request.getParameter("numGuests");
+            String specialRequests = request.getParameter("specialRequests");
 
-        Date checkIn = Date.valueOf(checkInStr);
-        Date checkOut = Date.valueOf(checkOutStr);
-        int numGuests = numGuestsStr != null ? Integer.parseInt(numGuestsStr) : 1;
+            // Validate
+            if (ValidationUtil.isEmpty(guestName) || ValidationUtil.isEmpty(contactNumber) ||
+                    ValidationUtil.isEmpty(roomType) || ValidationUtil.isEmpty(checkInStr)
+                    || ValidationUtil.isEmpty(checkOutStr)) {
+                request.setAttribute("error", "Please fill in all required fields.");
+                showBookingForm(request, response);
+                return;
+            }
 
-        if (!ValidationUtil.isValidDateRange(checkIn, checkOut)) {
-            request.setAttribute("error", "Check-out must be after check-in date.");
-            showBookingForm(request, response);
-            return;
-        }
+            Date checkIn = Date.valueOf(checkInStr);
+            Date checkOut = Date.valueOf(checkOutStr);
+            int numGuests = numGuestsStr != null ? Integer.parseInt(numGuestsStr) : 1;
 
-        String result = reservationService.createReservation(
-                currentUser.getId(), guestName, address, contactNumber,
-                roomType, checkIn, checkOut, numGuests, specialRequests, currentUser.getEmail());
+            if (!ValidationUtil.isValidDateRange(checkIn, checkOut)) {
+                request.setAttribute("error", "Check-out must be after check-in date.");
+                showBookingForm(request, response);
+                return;
+            }
 
-        if (result.startsWith("SUCCESS:")) {
-            String resNumber = result.split(":")[1];
-            request.setAttribute("success", "Reservation " + resNumber + " created successfully!");
-            showMyReservations(request, response, currentUser);
-        } else {
-            request.setAttribute("error", result);
+            String result = reservationService.createReservation(
+                    currentUser.getId(), guestName, address, contactNumber,
+                    roomType, checkIn, checkOut, numGuests, specialRequests, currentUser.getEmail());
+
+            if (result.startsWith("SUCCESS:")) {
+                String resNumber = result.split(":")[1];
+                request.setAttribute("success", "Reservation " + resNumber + " created successfully!");
+                showMyReservations(request, response, currentUser);
+            } else {
+                request.setAttribute("error", result);
+                showBookingForm(request, response);
+            }
+
+        } catch (Exception e) {
+            System.err.println("CRITICAL ERROR in createReservation: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "An internal server error occurred: " + e.getMessage());
             showBookingForm(request, response);
         }
     }
