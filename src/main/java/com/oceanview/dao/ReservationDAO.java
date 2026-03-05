@@ -368,7 +368,14 @@ public class ReservationDAO {
         res.setNumGuests(rs.getInt("num_guests"));
         res.setSpecialRequests(rs.getString("special_requests"));
         res.setTotalAmount(rs.getDouble("total_amount"));
-        res.setStatus(Reservation.Status.valueOf(rs.getString("status")));
+        String statusStr = rs.getString("status");
+        if (statusStr != null) {
+            try {
+                res.setStatus(Reservation.Status.valueOf(statusStr.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                res.setStatus(Reservation.Status.PENDING);
+            }
+        }
         res.setCreatedAt(rs.getTimestamp("created_at"));
         res.setUpdatedAt(rs.getTimestamp("updated_at"));
 

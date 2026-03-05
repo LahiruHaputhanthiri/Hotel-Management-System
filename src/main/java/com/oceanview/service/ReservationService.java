@@ -77,8 +77,8 @@ public class ReservationService {
             try {
                 EmailUtil.sendBookingConfirmation(userEmail, guestName, reservation.getReservationNumber(),
                         roomType, checkIn.toString(), checkOut.toString(), totalAmount);
-            } catch (Exception e) {
-                System.err.println("Booking email failed: " + e.getMessage());
+            } catch (Throwable t) {
+                System.err.println("Booking email failed: " + t.getMessage());
             }
 
             return "SUCCESS:" + reservation.getReservationNumber();

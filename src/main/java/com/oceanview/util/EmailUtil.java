@@ -1,8 +1,8 @@
 package com.oceanview.util;
 
 import java.util.Properties;
-import javax.mail.*;
-import javax.mail.internet.*;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 
 /**
  * Email utility using JavaMail API with Gmail SMTP.
