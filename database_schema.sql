@@ -103,8 +103,9 @@ CREATE TABLE IF NOT EXISTS payments (
 -- TRIGGER: Auto-generate reservation number
 -- Format: OVR-YYYYMMDD-XXXX (e.g., OVR-20260218-0001)
 -- ============================================================
+DROP TRIGGER IF EXISTS before_reservation_insert;
 DELIMITER //
-CREATE TRIGGER IF NOT EXISTS before_reservation_insert
+CREATE TRIGGER before_reservation_insert
 BEFORE INSERT ON reservations
 FOR EACH ROW
 BEGIN
