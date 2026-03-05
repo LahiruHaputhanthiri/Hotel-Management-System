@@ -130,12 +130,12 @@ DELIMITER ;
 -- ============================================================
 
 -- SuperAdmin account (password: Admin@123 - BCrypt hashed)
-INSERT INTO users (username, email, password_hash, full_name, role, is_verified) VALUES
+INSERT IGNORE INTO users (username, email, password_hash, full_name, role, is_verified) VALUES
 ('superadmin', 'superadmin@oceanview.com', '$2a$12$LJ3m4ys3LzSodX3Q/MIJaOJ3fFqSINoz9P8DCXE3CjXhl2bRhEzHe', 'System Administrator', 'SUPERADMIN', TRUE),
 ('admin', 'admin@oceanview.com', '$2a$12$LJ3m4ys3LzSodX3Q/MIJaOJ3fFqSINoz9P8DCXE3CjXhl2bRhEzHe', 'Hotel Manager', 'ADMIN', TRUE);
 
 -- Room Types with pricing
-INSERT INTO rooms (room_number, room_type, price_per_night, capacity, status, description, floor, has_ocean_view) VALUES
+INSERT IGNORE INTO rooms (room_number, room_type, price_per_night, capacity, status, description, floor, has_ocean_view) VALUES
 ('101', 'STANDARD', 75.00, 2, 'AVAILABLE', 'Comfortable standard room with modern amenities, queen-size bed, and garden view.', 1, FALSE),
 ('102', 'STANDARD', 75.00, 2, 'AVAILABLE', 'Cozy standard room with modern furnishings and garden view.', 1, FALSE),
 ('103', 'STANDARD', 85.00, 2, 'AVAILABLE', 'Standard room with partial ocean view and balcony.', 1, TRUE),

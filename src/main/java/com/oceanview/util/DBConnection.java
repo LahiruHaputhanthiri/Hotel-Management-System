@@ -13,7 +13,7 @@ public class DBConnection {
     // ============ Configuration ============
     private static final String URL = "jdbc:mysql://localhost:3306/oceanview_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "MySQL@1234";
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     // Singleton instance

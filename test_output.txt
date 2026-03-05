@@ -1,0 +1,10 @@
+Testing... 
+--- BCRYPT TEST --- 
+Error: Could not find or load main class Resort\OceanViewResort\src\main\webapp\WEB-INF\lib\jbcrypt-0.4.jar
+Caused by: java.lang.ClassNotFoundException: Resort\OceanViewResort\src\main\webapp\WEB-INF\lib\jbcrypt-0.4.jar
+--- DB CHECK --- 
+error: invalid flag: Resort\OceanViewResort\src\main\webapp\WEB-INF\lib\jbcrypt-0.4.jar;c:\Users\lahir\OneDrive\Desktop\Ocean
+Usage: javac <options> <source files>
+use --help for a list of possible options
+Error: Could not find or load main class Resort\OceanViewResort\src\main\webapp\WEB-INF\lib\jbcrypt-0.4.jar;c:\Users\lahir\OneDrive\Desktop\Ocean
+Caused by: java.lang.ClassNotFoundException: Resort\OceanViewResort\src\main\webapp\WEB-INF\lib\jbcrypt-0/4/jar;c:\Users\lahir\OneDrive\Desktop\Ocean
