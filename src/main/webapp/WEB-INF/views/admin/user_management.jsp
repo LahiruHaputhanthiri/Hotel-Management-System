@@ -100,8 +100,7 @@
                                                             <%= u.getEmail() %>
                                                         </td>
                                                         <td>
-                                                            <span class="badge-status" style="<%= u.isSuperAdmin() ? "
-                                                                background: #0D1B2A; color: #C6A75E;" :
+                                                            <span class="badge-status" style="<%= u.isSuperAdmin() ? "background: #0D1B2A; color: #C6A75E;" :
                                                                 u.hasAdminAccess()
                                                                 ? "background: #D1ECF1; color: #0C5460;"
                                                                 : "background: #E2E3E5; color: #383D41;" %>">

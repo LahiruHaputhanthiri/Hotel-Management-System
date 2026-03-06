@@ -21,8 +21,8 @@
                                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                                 <h4><i class="fas fa-info-circle" style="color: var(--accent);"></i> Booking Information
                                 </h4>
-                                <span class="badge-status badge-<%= res.getStatus().name().toLowerCase().replace("
-                                    _", "-" ) %>" style="font-size: 0.85rem; padding: 8px 20px;">
+                                <span
+                                    class="badge-status badge-<%= res.getStatus() != null ? res.getStatus().name().toLowerCase().replace("_", "-" ) : "pending" %>" style="font-size: 0.85rem; padding: 8px 20px;">
                                     <%= res.getStatusDisplay() %>
                                 </span>
                             </div>

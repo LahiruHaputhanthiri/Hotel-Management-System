@@ -76,7 +76,7 @@
 
                             <div style="margin-top: 30px; text-align: center;">
                                 <span
-                                    class="badge-status badge-<%= payment.getPaymentStatus() != null ? payment.getPaymentStatus().toLowerCase() : "pending" %>"
+                                    class="badge-status badge-<%= payment.getPaymentStatus() != null ? payment.getPaymentStatus().name().toLowerCase() : "pending" %>"
                                     style="font-size: 0.9rem; padding: 10px 24px;">
                                     Payment: <%= payment.getPaymentStatus() !=null ? payment.getPaymentStatus()
                                         : "PENDING" %>

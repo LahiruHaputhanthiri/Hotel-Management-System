@@ -25,6 +25,19 @@ public class UserManagementServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        if (!currentUser.isSuperAdmin()) {
+            response.sendError(403);
+            return;
+        }
+
         List<User> users = userService.getAllUsers();
         request.setAttribute("users", users);
         request.setAttribute("csrfToken", CSRFTokenUtil.generateToken(request));

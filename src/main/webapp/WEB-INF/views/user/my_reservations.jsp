@@ -36,8 +36,7 @@
                                             <div
                                                 style="position: absolute; top: 0; right: 0; padding: 8px 18px; border-radius: 0 0 0 var(--radius-md);">
                                                 <span
-                                                    class="badge-status badge-<%= res.getStatus().name().toLowerCase().replace("
-                                                    _", "-" ) %>">
+                                                    class="badge-status badge-<%= res.getStatus() != null ? res.getStatus().name().toLowerCase().replace("_", "-" ) : "pending" %>">
                                                     <%= res.getStatusDisplay() %>
                                                 </span>
                                             </div>

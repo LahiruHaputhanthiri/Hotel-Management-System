@@ -14,10 +14,8 @@ public class RoomDAO {
 
     public boolean insert(Room room) {
         String sql = "INSERT INTO rooms (room_number, room_type, price_per_night, capacity, status, description, image_url, floor, has_ocean_view) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, room.getRoomNumber());
             ps.setString(2, room.getRoomType().name());
             ps.setDouble(3, room.getPricePerNight());
@@ -36,26 +34,20 @@ public class RoomDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error inserting room: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
 
     public Room findById(int id) {
         String sql = "SELECT * FROM rooms WHERE id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return mapRoom(rs);
         } catch (SQLException e) {
             System.err.println("Error finding room: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return null;
     }
@@ -63,17 +55,13 @@ public class RoomDAO {
     public List<Room> findAll() {
         List<Room> rooms = new ArrayList<>();
         String sql = "SELECT * FROM rooms ORDER BY room_number";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next())
                 rooms.add(mapRoom(rs));
         } catch (SQLException e) {
             System.err.println("Error finding all rooms: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return rooms;
     }
@@ -81,18 +69,14 @@ public class RoomDAO {
     public List<Room> findByType(String roomType) {
         List<Room> rooms = new ArrayList<>();
         String sql = "SELECT * FROM rooms WHERE room_type = ? ORDER BY room_number";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roomType);
             ResultSet rs = ps.executeQuery();
             while (rs.next())
                 rooms.add(mapRoom(rs));
         } catch (SQLException e) {
             System.err.println("Error finding rooms by type: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return rooms;
     }
@@ -110,10 +94,8 @@ public class RoomDAO {
                 "  AND res.status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN') " +
                 "  AND res.check_in < ? AND res.check_out > ?" +
                 ") ORDER BY r.room_number";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roomType);
             ps.setDate(2, checkOut);
             ps.setDate(3, checkIn);
@@ -122,8 +104,6 @@ public class RoomDAO {
                 rooms.add(mapRoom(rs));
         } catch (SQLException e) {
             System.err.println("Error finding available rooms: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return rooms;
     }
@@ -133,18 +113,14 @@ public class RoomDAO {
      */
     public int countAvailableByType(String roomType) {
         String sql = "SELECT COUNT(*) FROM rooms WHERE room_type = ? AND status = 'AVAILABLE'";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roomType);
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return rs.getInt(1);
         } catch (SQLException e) {
             System.err.println("Error counting available rooms: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return 0;
     }
@@ -154,62 +130,48 @@ public class RoomDAO {
      */
     public double getPriceByType(String roomType) {
         String sql = "SELECT price_per_night FROM rooms WHERE room_type = ? LIMIT 1";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roomType);
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return rs.getDouble("price_per_night");
         } catch (SQLException e) {
             System.err.println("Error getting room price: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return 0;
     }
 
     public boolean updateStatus(int roomId, String status) {
         String sql = "UPDATE rooms SET status = ? WHERE id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, roomId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating room status: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
 
     public boolean updatePrice(int roomId, double newPrice) {
         String sql = "UPDATE rooms SET price_per_night = ? WHERE id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, newPrice);
             ps.setInt(2, roomId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating room price: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
 
     public boolean update(Room room) {
         String sql = "UPDATE rooms SET room_number=?, room_type=?, price_per_night=?, capacity=?, status=?, description=?, image_url=?, floor=?, has_ocean_view=? WHERE id=?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, room.getRoomNumber());
             ps.setString(2, room.getRoomType().name());
             ps.setDouble(3, room.getPricePerNight());
@@ -223,24 +185,18 @@ public class RoomDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating room: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
 
     public boolean delete(int id) {
         String sql = "DELETE FROM rooms WHERE id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error deleting room: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
@@ -252,17 +208,13 @@ public class RoomDAO {
         String sql = "SELECT " +
                 "(SELECT COUNT(*) FROM rooms WHERE status = 'OCCUPIED') * 100.0 / " +
                 "(SELECT COUNT(*) FROM rooms) AS rate";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return rs.getDouble("rate");
         } catch (SQLException e) {
             System.err.println("Error getting occupancy: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return 0;
     }

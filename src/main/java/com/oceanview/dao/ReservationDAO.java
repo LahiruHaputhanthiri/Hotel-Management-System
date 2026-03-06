@@ -16,10 +16,8 @@ public class ReservationDAO {
 
     public boolean insert(Reservation res) {
         String sql = "INSERT INTO reservations (reservation_number, user_id, guest_name, address, contact_number, room_id, room_type, check_in, check_out, num_guests, special_requests, total_amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, res.getReservationNumber());
             ps.setInt(2, res.getUserId());
             ps.setString(3, res.getGuestName());
@@ -52,8 +50,6 @@ public class ReservationDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error inserting reservation: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
@@ -64,18 +60,14 @@ public class ReservationDAO {
                 "LEFT JOIN users u ON r.user_id = u.id " +
                 "LEFT JOIN rooms rm ON r.room_id = rm.id " +
                 "WHERE r.id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return mapReservation(rs);
         } catch (SQLException e) {
             System.err.println("Error finding reservation: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return null;
     }
@@ -86,18 +78,14 @@ public class ReservationDAO {
                 "LEFT JOIN users u ON r.user_id = u.id " +
                 "LEFT JOIN rooms rm ON r.room_id = rm.id " +
                 "WHERE r.reservation_number = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, number);
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return mapReservation(rs);
         } catch (SQLException e) {
             System.err.println("Error finding by reservation number: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return null;
     }
@@ -109,18 +97,14 @@ public class ReservationDAO {
                 "LEFT JOIN users u ON r.user_id = u.id " +
                 "LEFT JOIN rooms rm ON r.room_id = rm.id " +
                 "WHERE r.user_id = ? ORDER BY r.created_at DESC";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next())
                 list.add(mapReservation(rs));
         } catch (SQLException e) {
             System.err.println("Error finding user reservations: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return list;
     }
@@ -132,17 +116,13 @@ public class ReservationDAO {
                 "LEFT JOIN users u ON r.user_id = u.id " +
                 "LEFT JOIN rooms rm ON r.room_id = rm.id " +
                 "ORDER BY r.created_at DESC";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next())
                 list.add(mapReservation(rs));
         } catch (SQLException e) {
             System.err.println("Error finding all reservations: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return list;
     }
@@ -158,10 +138,8 @@ public class ReservationDAO {
                 "LEFT JOIN rooms rm ON r.room_id = rm.id " +
                 "WHERE r.guest_name LIKE ? OR r.reservation_number LIKE ? OR r.contact_number LIKE ? " +
                 "ORDER BY r.created_at DESC";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             String pattern = "%" + keyword + "%";
             ps.setString(1, pattern);
             ps.setString(2, pattern);
@@ -171,35 +149,27 @@ public class ReservationDAO {
                 list.add(mapReservation(rs));
         } catch (SQLException e) {
             System.err.println("Error searching reservations: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return list;
     }
 
     public boolean updateStatus(int id, String status) {
         String sql = "UPDATE reservations SET status = ? WHERE id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating reservation status: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
 
     public boolean update(Reservation res) {
         String sql = "UPDATE reservations SET guest_name=?, address=?, contact_number=?, room_id=?, room_type=?, check_in=?, check_out=?, num_guests=?, special_requests=?, total_amount=?, status=? WHERE id=?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, res.getGuestName());
             ps.setString(2, res.getAddress());
             ps.setString(3, res.getContactNumber());
@@ -218,24 +188,18 @@ public class ReservationDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating reservation: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
 
     public boolean delete(int id) {
         String sql = "DELETE FROM reservations WHERE id = ?";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error deleting reservation: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return false;
     }
@@ -244,34 +208,26 @@ public class ReservationDAO {
 
     public int getTotalReservations() {
         String sql = "SELECT COUNT(*) FROM reservations";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return rs.getInt(1);
         } catch (SQLException e) {
             System.err.println("Error counting reservations: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return 0;
     }
 
     public double getTotalRevenue() {
         String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM reservations WHERE status IN ('CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT')";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return rs.getDouble(1);
         } catch (SQLException e) {
             System.err.println("Error getting total revenue: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return 0;
     }
@@ -290,10 +246,8 @@ public class ReservationDAO {
                 "FROM reservations WHERE YEAR(created_at) = YEAR(NOW()) " +
                 "AND status IN ('CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT') " +
                 "GROUP BY MONTH(created_at) ORDER BY m";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int monthIdx = rs.getInt("m") - 1;
@@ -303,8 +257,6 @@ public class ReservationDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error getting monthly revenue: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return data;
     }
@@ -314,17 +266,13 @@ public class ReservationDAO {
      */
     public String getTopRoomType() {
         String sql = "SELECT room_type, COUNT(*) as cnt FROM reservations GROUP BY room_type ORDER BY cnt DESC LIMIT 1";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next())
                 return rs.getString("room_type");
         } catch (SQLException e) {
             System.err.println("Error getting top room type: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return "N/A";
     }
@@ -335,18 +283,14 @@ public class ReservationDAO {
     public Map<String, Integer> getCountByStatus() {
         Map<String, Integer> data = new LinkedHashMap<>();
         String sql = "SELECT status, COUNT(*) as cnt FROM reservations GROUP BY status";
-        Connection conn = null;
-        try {
-            conn = DBConnection.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 data.put(rs.getString("status"), rs.getInt("cnt"));
             }
         } catch (SQLException e) {
             System.err.println("Error getting count by status: " + e.getMessage());
-        } finally {
-            DBConnection.closeConnection(conn);
         }
         return data;
     }
@@ -368,6 +312,7 @@ public class ReservationDAO {
         res.setNumGuests(rs.getInt("num_guests"));
         res.setSpecialRequests(rs.getString("special_requests"));
         res.setTotalAmount(rs.getDouble("total_amount"));
+
         String statusStr = rs.getString("status");
         if (statusStr != null) {
             try {
@@ -375,7 +320,10 @@ public class ReservationDAO {
             } catch (IllegalArgumentException e) {
                 res.setStatus(Reservation.Status.PENDING);
             }
+        } else {
+            res.setStatus(Reservation.Status.PENDING);
         }
+
         res.setCreatedAt(rs.getTimestamp("created_at"));
         res.setUpdatedAt(rs.getTimestamp("updated_at"));
 

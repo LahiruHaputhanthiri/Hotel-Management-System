@@ -36,6 +36,7 @@ public class Reservation {
 
     // Default constructor
     public Reservation() {
+        this.status = Status.PENDING;
     }
 
     // Private constructor for Builder

@@ -109,9 +109,10 @@
                                                     <% if (rooms !=null) { for (Room room : rooms) { %>
                                                         <tr>
                                                             <td>
-                                                                <img src="<%= request.getContextPath() %>/images/room_<%= room.getRoomType().name().toLowerCase() %>.jpg"
-                                                                    style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border);"
-                                                                    onerror="this.src='https://placehold.co/50x35?text=No+Img'">
+                                                                <img src="<%= request.getContextPath() %>/images/room_<%= room.getRoomType() != null ? room.getRoomType().name().toLowerCase() : "standard" %>.jpg"
+                                                                style="width: 50px; height: 35px; object-fit: cover;
+                                                                border-radius: 4px; border: 1px solid var(--border);"
+                                                                onerror="this.src='https://placehold.co/50x35?text=No+Img'">
                                                             </td>
                                                             <td><strong>
                                                                     <%= room.getRoomNumber() %>
@@ -134,8 +135,8 @@
                                                                     %>
                                                             </td>
                                                             <td>
-                                                                <span class="badge-status" style="<%= "
-                                                                    AVAILABLE".equals(room.getStatus().name())
+                                                                <span class="badge-status"
+                                                                    style="<%= room.getStatus() != null && "AVAILABLE".equals(room.getStatus().name())
                                                                     ? "background:#D4EDDA;color:#155724;"
                                                                     : "background:#F8D7DA;color:#721C24;" %>">
                                                                     <%= room.getStatusDisplay() %>

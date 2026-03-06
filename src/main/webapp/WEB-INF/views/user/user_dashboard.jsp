@@ -80,8 +80,8 @@
                                                     <%= res.getCheckOut() %>
                                                 </td>
                                                 <td><span
-                                                        class="badge-status badge-<%= res.getStatus().name().toLowerCase().replace("
-                                                        _", "-" ) %>"><%= res.getStatusDisplay() %></span></td>
+                                                        class="badge-status badge-<%= res.getStatus() != null ? res.getStatus().name().toLowerCase().replace("_", "-" ) : "pending" %>"><%= res.getStatusDisplay() %></span>
+                                                </td>
                                                 <td>
                                                     <a href="<%= ctx %>/reservations/view?id=<%= res.getId() %>"
                                                         class="btn-dark-custom"

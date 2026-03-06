@@ -22,7 +22,7 @@ public class AuthFilter implements Filter {
             "/", "/index.jsp", "/login.jsp", "/register.jsp",
             "/auth", "/css/", "/js/", "/images/", "/fonts/",
             "/verify.jsp", "/forgot_password.jsp", "/reset_password.jsp",
-            "/api/");
+            "/api/", "/help", "/diagnostics");
 
     // Paths requiring ADMIN or SUPERADMIN
     private static final List<String> ADMIN_PATHS = Arrays.asList(
@@ -48,8 +48,14 @@ public class AuthFilter implements Filter {
 
         String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
 
+        // Normalize path: replace multiple slashes with one
+        path = path.replaceAll("//+", "/");
+        if (!path.startsWith("/"))
+            path = "/" + path;
+
         // Allow public paths
         if (isPublicPath(path)) {
+            // System.out.println("DEBUG AuthFilter: Allowed public path: " + path);
             chain.doFilter(request, response);
             return;
         }
@@ -103,9 +109,19 @@ public class AuthFilter implements Filter {
     }
 
     private boolean isPublicPath(String path) {
+        if (path.equals("/") || path.isEmpty())
+            return true;
+
         for (String pub : PUBLIC_PATHS) {
-            if (path.equals(pub) || path.startsWith(pub))
-                return true;
+            if (pub.equals("/"))
+                continue;
+            if (pub.endsWith("/")) {
+                if (path.startsWith(pub))
+                    return true;
+            } else {
+                if (path.equals(pub) || path.equals(pub + "/"))
+                    return true;
+            }
         }
         return false;
     }

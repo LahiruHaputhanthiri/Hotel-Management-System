@@ -102,7 +102,7 @@ public class ReservationService {
         }
 
         long nights = res.getNumberOfNights();
-        return Payment.calculateBill(reservationId, nights, pricePerNight);
+        return Payment.calculateBill(reservationId, (double) nights, pricePerNight);
     }
 
     /**

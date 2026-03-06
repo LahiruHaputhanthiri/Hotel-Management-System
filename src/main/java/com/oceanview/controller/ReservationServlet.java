@@ -36,7 +36,12 @@ public class ReservationServlet extends HttpServlet {
             pathInfo = "/";
 
         HttpSession session = request.getSession(false);
-        User currentUser = (User) session.getAttribute("user");
+        User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
 
         switch (pathInfo) {
             case "/new":
@@ -70,7 +75,12 @@ public class ReservationServlet extends HttpServlet {
             pathInfo = "/";
 
         HttpSession session = request.getSession(false);
-        User currentUser = (User) session.getAttribute("user");
+        User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
 
         switch (pathInfo) {
             case "/create":

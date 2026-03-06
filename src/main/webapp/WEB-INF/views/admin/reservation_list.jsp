@@ -78,8 +78,7 @@
                                                 </td>
                                                 <td>
                                                     <span
-                                                        class="badge-status badge-<%= res.getStatus().name().toLowerCase().replace("
-                                                        _", "-" ) %>">
+                                                        class="badge-status badge-<%= res.getStatus() != null ? res.getStatus().name().toLowerCase().replace("_", "-" ) : "pending" %>">
                                                         <%= res.getStatusDisplay() %>
                                                     </span>
                                                 </td>
