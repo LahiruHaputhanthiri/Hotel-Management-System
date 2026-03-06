@@ -46,16 +46,14 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        // Get sanitized path
         String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
-
-        // Normalize path: replace multiple slashes with one
-        path = path.replaceAll("//+", "/");
+        path = path.replaceAll("//+", "/").toLowerCase();
         if (!path.startsWith("/"))
             path = "/" + path;
 
-        // Allow public paths
+        // Allow public paths (case-insensitive)
         if (isPublicPath(path)) {
-            // System.out.println("DEBUG AuthFilter: Allowed public path: " + path);
             chain.doFilter(request, response);
             return;
         }
@@ -74,72 +72,65 @@ public class AuthFilter implements Filter {
             if (currentUser != null) {
                 session = httpRequest.getSession(true);
                 session.setAttribute("user", currentUser);
-                session.setMaxInactiveInterval(SESSION_TIMEOUT_MINUTES * 60);
             }
         }
 
-        // No authenticated user → redirect to login
+        // 1. Force Authentication for all non-public pages
         if (currentUser == null) {
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login.jsp");
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login.jsp?error=auth_required");
             return;
         }
 
-        // Check admin access
-        if (isAdminPath(path) && !currentUser.hasAdminAccess()) {
-            httpRequest.getRequestDispatcher("/WEB-INF/views/error/403.jsp").forward(httpRequest, httpResponse);
-            return;
+        // 2. Strict Admin Authorization
+        if (isAdminPath(path)) {
+            if (!currentUser.hasAdminAccess()) {
+                System.err.println("SECURITY ALERT: Unauthorized Admin Access Attempt by: " + currentUser.getUsername()
+                        + " on " + path);
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Admin privileges required.");
+                return;
+            }
         }
 
-        // Check superadmin access
-        if (isSuperAdminPath(path) && !currentUser.isSuperAdmin()) {
-            httpRequest.getRequestDispatcher("/WEB-INF/views/error/403.jsp").forward(httpRequest, httpResponse);
-            return;
+        // 3. Strict SuperAdmin Authorization
+        if (isSuperAdminPath(path)) {
+            if (!currentUser.isSuperAdmin()) {
+                System.err.println("SECURITY ALERT: Unauthorized SuperAdmin Access Attempt by: "
+                        + currentUser.getUsername() + " on " + path);
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "Access Denied: SuperAdmin privileges required.");
+                return;
+            }
         }
 
-        // Set user attribute for JSPs
+        // Set user attribute and security headers
         httpRequest.setAttribute("currentUser", currentUser);
-
-        // Set security headers
         httpResponse.setHeader("X-Content-Type-Options", "nosniff");
-        httpResponse.setHeader("X-Frame-Options", "DENY");
-        httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
-        httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
+        httpResponse.setHeader("Content-Security-Policy",
+                "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;");
 
         chain.doFilter(request, response);
     }
 
     private boolean isPublicPath(String path) {
-        if (path.equals("/") || path.isEmpty())
+        String p = path.toLowerCase();
+        if (p.equals("/") || p.isEmpty())
             return true;
 
-        for (String pub : PUBLIC_PATHS) {
-            if (pub.equals("/"))
-                continue;
-            if (pub.endsWith("/")) {
-                if (path.startsWith(pub))
-                    return true;
-            } else {
-                if (path.equals(pub) || path.equals(pub + "/"))
-                    return true;
-            }
-        }
-        return false;
+        return PUBLIC_PATHS.stream().anyMatch(pub -> {
+            String pubLower = pub.toLowerCase();
+            return pubLower.endsWith("/") ? p.startsWith(pubLower) : p.equals(pubLower);
+        });
     }
 
     private boolean isAdminPath(String path) {
-        for (String admin : ADMIN_PATHS) {
-            if (path.startsWith(admin))
-                return true;
-        }
-        return false;
+        String p = path.toLowerCase();
+        return ADMIN_PATHS.stream().anyMatch(admin -> p.startsWith(admin.toLowerCase()));
     }
 
     private boolean isSuperAdminPath(String path) {
-        for (String sa : SUPERADMIN_PATHS) {
-            if (path.startsWith(sa))
-                return true;
-        }
-        return false;
+        String p = path.toLowerCase();
+        return SUPERADMIN_PATHS.stream().anyMatch(sa -> p.startsWith(sa.toLowerCase()));
     }
 
     private User checkRememberMeCookie(HttpServletRequest request) {
