@@ -14,8 +14,8 @@ public class EmailUtil {
     // UPDATE THESE with your Gmail credentials
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
-    private static final String EMAIL_FROM = "your.email@gmail.com"; // Your Gmail
-    private static final String EMAIL_PASSWORD = "your-app-password"; // Gmail App Password
+    private static final String EMAIL_FROM = "lahiruhaputhanthiri@gmail.com"; // Your Gmail
+    private static final String EMAIL_PASSWORD = "mkyczwmhktdmahut"; // Gmail App Password
     private static final String APP_NAME = "Ocean View Resort";
     private static final String BASE_URL = "http://localhost:8080/OceanViewResort";
 
@@ -153,5 +153,27 @@ public class EmailUtil {
                 "<a href='" + resetUrl + "' class='btn'>Reset Password</a>" +
                 "<p style='color: #999; font-size: 13px;'>This link will expire in 1 hour. If you didn't request this, please ignore this email.</p>";
         sendEmail(to, "Password Reset - Ocean View Resort", wrapInTemplate("Reset Password", content));
+    }
+
+    /**
+     * Send a general welcome note to new guests.
+     */
+    public static void sendWelcomeNote(String to, String guestName) {
+        String content = "<h2>Welcome to the Family!</h2>" +
+                "<p>Dear <strong>" + guestName + "</strong>,</p>" +
+                "<p>We are absolutely delighted to have you with us at <strong>Ocean View Resort</strong>.</p>" +
+                "<p>Our team is dedicated to providing you with an unforgettable experience filled with relaxation and premium hospitality. " +
+                "Whether you're here for a weekend getaway or a long vacation, we're here to make every moment special.</p>" +
+                "<div style='background: #f8f8f8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #C6A75E;'>" +
+                "<p style='margin: 0;'><strong>What's Next?</strong></p>" +
+                "<ul style='margin-top: 10px; padding-left: 20px;'>" +
+                "<li>Explore our premium room galleries.</li>" +
+                "<li>Check out our spa and dining options.</li>" +
+                "<li>Manage your bookings through our secure dashboard.</li>" +
+                "</ul>" +
+                "</div>" +
+                "<p>If there's anything we can do to assist you, please don't hesitate to reach out.</p>" +
+                "<a href='" + BASE_URL + "' class='btn'>Visit Our Website</a>";
+        sendEmail(to, "A Warm Welcome from Ocean View Resort", wrapInTemplate("Welcome", content));
     }
 }

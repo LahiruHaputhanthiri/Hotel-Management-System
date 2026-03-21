@@ -97,6 +97,9 @@ public class ReservationServlet extends HttpServlet {
             case "/cancel":
                 cancelReservation(request, response, currentUser);
                 break;
+            case "/pay":
+                processPayment(request, response, currentUser);
+                break;
             case "/delete":
                 deleteReservation(request, response, currentUser);
                 break;
@@ -276,6 +279,25 @@ public class ReservationServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/reservations/?success=Reservation cancelled");
         } else {
             response.sendRedirect(request.getContextPath() + "/reservations/my?success=Reservation cancelled");
+        }
+    }
+
+    private void processPayment(HttpServletRequest request, HttpServletResponse response, User currentUser)
+            throws ServletException, IOException {
+
+        if (!currentUser.hasAdminAccess()) {
+            response.sendError(403);
+            return;
+        }
+
+        int reservationId = Integer.parseInt(request.getParameter("id"));
+        Payment payment = paymentDAO.findByReservation(reservationId);
+
+        if (payment != null) {
+            paymentDAO.updateStatus(payment.getId(), "COMPLETED");
+            response.sendRedirect(request.getContextPath() + "/reservations/bill?id=" + reservationId + "&success=Payment marked as completed");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/reservations/bill?id=" + reservationId + "&error=Payment record not found");
         }
     }
 
