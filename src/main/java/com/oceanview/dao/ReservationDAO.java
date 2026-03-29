@@ -15,7 +15,7 @@ import java.util.Map;
 public class ReservationDAO {
 
     public boolean insert(Reservation res) {
-        String sql = "INSERT INTO reservations (reservation_number, user_id, guest_name, address, contact_number, room_id, room_type, check_in, check_out, num_guests, special_requests, total_amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (reservation_number, user_id, guest_name, address, contact_number, guest_email, room_id, room_type, check_in, check_out, num_guests, special_requests, total_amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, res.getReservationNumber());
@@ -23,17 +23,18 @@ public class ReservationDAO {
             ps.setString(3, res.getGuestName());
             ps.setString(4, res.getAddress());
             ps.setString(5, res.getContactNumber());
+            ps.setString(6, res.getGuestEmail());
             if (res.getRoomId() > 0)
-                ps.setInt(6, res.getRoomId());
+                ps.setInt(7, res.getRoomId());
             else
-                ps.setNull(6, Types.INTEGER);
-            ps.setString(7, res.getRoomType());
-            ps.setDate(8, res.getCheckIn());
-            ps.setDate(9, res.getCheckOut());
-            ps.setInt(10, res.getNumGuests());
-            ps.setString(11, res.getSpecialRequests());
-            ps.setDouble(12, res.getTotalAmount());
-            ps.setString(13, res.getStatus() != null ? res.getStatus().name() : "PENDING");
+                ps.setNull(7, Types.INTEGER);
+            ps.setString(8, res.getRoomType());
+            ps.setDate(9, res.getCheckIn());
+            ps.setDate(10, res.getCheckOut());
+            ps.setInt(11, res.getNumGuests());
+            ps.setString(12, res.getSpecialRequests());
+            ps.setDouble(13, res.getTotalAmount());
+            ps.setString(14, res.getStatus() != null ? res.getStatus().name() : "PENDING");
 
             int rows = ps.executeUpdate();
             if (rows > 0) {
@@ -167,24 +168,25 @@ public class ReservationDAO {
     }
 
     public boolean update(Reservation res) {
-        String sql = "UPDATE reservations SET guest_name=?, address=?, contact_number=?, room_id=?, room_type=?, check_in=?, check_out=?, num_guests=?, special_requests=?, total_amount=?, status=? WHERE id=?";
+        String sql = "UPDATE reservations SET guest_name=?, address=?, contact_number=?, guest_email=?, room_id=?, room_type=?, check_in=?, check_out=?, num_guests=?, special_requests=?, total_amount=?, status=? WHERE id=?";
         try (Connection conn = DBConnection.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, res.getGuestName());
             ps.setString(2, res.getAddress());
             ps.setString(3, res.getContactNumber());
+            ps.setString(4, res.getGuestEmail());
             if (res.getRoomId() > 0)
-                ps.setInt(4, res.getRoomId());
+                ps.setInt(5, res.getRoomId());
             else
-                ps.setNull(4, Types.INTEGER);
-            ps.setString(5, res.getRoomType());
-            ps.setDate(6, res.getCheckIn());
-            ps.setDate(7, res.getCheckOut());
-            ps.setInt(8, res.getNumGuests());
-            ps.setString(9, res.getSpecialRequests());
-            ps.setDouble(10, res.getTotalAmount());
-            ps.setString(11, res.getStatus().name());
-            ps.setInt(12, res.getId());
+                ps.setNull(5, Types.INTEGER);
+            ps.setString(6, res.getRoomType());
+            ps.setDate(7, res.getCheckIn());
+            ps.setDate(8, res.getCheckOut());
+            ps.setInt(9, res.getNumGuests());
+            ps.setString(10, res.getSpecialRequests());
+            ps.setDouble(11, res.getTotalAmount());
+            ps.setString(12, res.getStatus().name());
+            ps.setInt(13, res.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating reservation: " + e.getMessage());
@@ -305,6 +307,7 @@ public class ReservationDAO {
         res.setGuestName(rs.getString("guest_name"));
         res.setAddress(rs.getString("address"));
         res.setContactNumber(rs.getString("contact_number"));
+        res.setGuestEmail(rs.getString("guest_email"));
         res.setRoomId(rs.getInt("room_id"));
         res.setRoomType(rs.getString("room_type"));
         res.setCheckIn(rs.getDate("check_in"));

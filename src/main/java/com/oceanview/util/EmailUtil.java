@@ -176,4 +176,23 @@ public class EmailUtil {
                 "<a href='" + BASE_URL + "' class='btn'>Visit Our Website</a>";
         sendEmail(to, "A Warm Welcome from Ocean View Resort", wrapInTemplate("Welcome", content));
     }
+
+    /**
+     * Send payment success and thank you email.
+     */
+    public static void sendPaymentSuccessEmail(String to, String guestName, String reservationNumber, double amount) {
+        String content = "<h2>Payment Received - Thank You!</h2>" +
+                "<p>Dear <strong>" + guestName + "</strong>,</p>" +
+                "<p>We have successfully received your payment for reservation <strong>" + reservationNumber + "</strong>.</p>" +
+                "<div style='background: #f8f8f8; padding: 25px; border-radius: 12px; margin: 20px 0; border: 1px solid #e0e0e0; text-align: center;'>" +
+                "<p style='margin: 0; color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;'>Amount Paid</p>" +
+                "<h1 style='margin: 10px 0; color: #0D1B2A; font-size: 36px;'>$" + String.format("%.2f", amount) + "</h1>" +
+                "<p style='margin: 0; color: #C6A75E; font-weight: 600;'>Payment Status: COMPLETED</p>" +
+                "</div>" +
+                "<p>Thank you for choosing Ocean View Resort. We are thrilled to have you as our guest and look forward to providing you with an exceptional stay.</p>" +
+                "<p>You can view your full invoice and manage your booking details anytime through your dashboard.</p>" +
+                "<a href='" + BASE_URL + "/reservations/bill?id=" + reservationNumber + "' class='btn'>View My Invoice</a>" +
+                "<p style='margin-top: 20px;'>Warm regards,<br><strong>The Ocean View Team</strong></p>";
+        sendEmail(to, "Payment Successful - " + reservationNumber, wrapInTemplate("Payment Success", content));
+    }
 }

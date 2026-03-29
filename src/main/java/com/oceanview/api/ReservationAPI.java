@@ -3,7 +3,6 @@ package com.oceanview.api;
 import com.oceanview.model.Reservation;
 import com.oceanview.model.Room;
 import com.oceanview.service.ReservationService;
-import com.oceanview.dao.RoomDAO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -29,7 +28,6 @@ import java.util.Map;
 public class ReservationAPI extends HttpServlet {
 
     private ReservationService reservationService = new ReservationService();
-    private RoomDAO roomDAO = new RoomDAO();
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 
     @Override

@@ -32,8 +32,6 @@ public class AuthFilter implements Filter {
     private static final List<String> SUPERADMIN_PATHS = Arrays.asList(
             "/superadmin/");
 
-    private static final int SESSION_TIMEOUT_MINUTES = 15;
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // No initialization needed

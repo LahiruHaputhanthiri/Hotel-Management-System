@@ -1,7 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <%@ page import="com.oceanview.model.Reservation, com.oceanview.model.Payment" %>
+    <%@ page import="com.oceanview.model.Reservation, com.oceanview.model.Payment, com.oceanview.model.User" %>
         <% String ctx=request.getContextPath(); Reservation res=(Reservation) request.getAttribute("reservation");
-            Payment payment=(Payment) request.getAttribute("payment"); %>
+            Payment payment=(Payment) request.getAttribute("payment");
+            User currentUser = (User) session.getAttribute("user"); %>
             <jsp:include page="/WEB-INF/views/includes/header.jsp">
                 <jsp:param name="title" value="Invoice - Ocean View Resort" />
             </jsp:include>
@@ -87,6 +88,14 @@
 
                     <div class="no-print"
                         style="text-align: center; margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
+                        <% if (currentUser != null && currentUser.hasAdminAccess() && payment != null && (payment.getPaymentStatus() == null || payment.getPaymentStatus() == Payment.PaymentStatus.PENDING)) { %>
+                            <form action="<%= ctx %>/reservations/pay" method="post" style="margin: 0;">
+                                <input type="hidden" name="id" value="<%= res.getId() %>">
+                                <button type="submit" class="btn-primary-custom" style="padding: 12px 28px; background-color: var(--status-confirmed); border-color: var(--status-confirmed);">
+                                    <i class="fas fa-check-circle"></i> Mark as Paid (Cash)
+                                </button>
+                            </form>
+                        <% } %>
                         <button onclick="printInvoice()" class="btn-dark-custom" style="padding: 12px 28px;">
                             <i class="fas fa-print"></i> Print
                         </button>

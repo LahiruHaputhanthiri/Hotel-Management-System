@@ -41,10 +41,16 @@
                                                         placeholder="Full name" required>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Contact Number *</label>
-                                                    <input type="tel" name="contactNumber" class="form-control-custom"
-                                                        placeholder="+94 77 123 4567" required>
+                                                    <label>Email Address *</label>
+                                                    <input type="email" name="guestEmail" class="form-control-custom"
+                                                        placeholder="email@example.com" required>
                                                 </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Contact Number *</label>
+                                                <input type="tel" name="contactNumber" class="form-control-custom"
+                                                    placeholder="+94 77 123 4567" required>
                                             </div>
 
                                             <div class="form-group">

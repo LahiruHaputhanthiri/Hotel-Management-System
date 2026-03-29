@@ -18,6 +18,7 @@ public class Reservation {
     private String guestName;
     private String address;
     private String contactNumber;
+    private String guestEmail;
     private int roomId;
     private String roomType;
     private Date checkIn;
@@ -47,6 +48,7 @@ public class Reservation {
         this.guestName = builder.guestName;
         this.address = builder.address;
         this.contactNumber = builder.contactNumber;
+        this.guestEmail = builder.guestEmail;
         this.roomId = builder.roomId;
         this.roomType = builder.roomType;
         this.checkIn = builder.checkIn;
@@ -66,6 +68,7 @@ public class Reservation {
         private String guestName;
         private String address;
         private String contactNumber;
+        private String guestEmail;
         private int roomId;
         private String roomType;
         private Date checkIn;
@@ -105,6 +108,11 @@ public class Reservation {
 
         public Builder contactNumber(String contactNumber) {
             this.contactNumber = contactNumber;
+            return this;
+        }
+
+        public Builder guestEmail(String guestEmail) {
+            this.guestEmail = guestEmail;
             return this;
         }
 
@@ -201,6 +209,14 @@ public class Reservation {
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
+    }
+
+    public String getGuestEmail() {
+        return guestEmail;
+    }
+
+    public void setGuestEmail(String guestEmail) {
+        this.guestEmail = guestEmail;
     }
 
     public int getRoomId() {

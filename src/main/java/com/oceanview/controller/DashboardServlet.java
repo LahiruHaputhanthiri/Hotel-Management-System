@@ -3,14 +3,12 @@ package com.oceanview.controller;
 import com.oceanview.model.User;
 import com.oceanview.service.ReservationService;
 import com.oceanview.service.UserService;
-import com.oceanview.dao.RoomDAO;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +19,6 @@ public class DashboardServlet extends HttpServlet {
 
     private ReservationService reservationService = new ReservationService();
     private UserService userService = new UserService();
-    private RoomDAO roomDAO = new RoomDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

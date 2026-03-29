@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     guest_name VARCHAR(100) NOT NULL,
     address VARCHAR(255),
     contact_number VARCHAR(20) NOT NULL,
+    guest_email VARCHAR(100),
     room_id INT,
     room_type ENUM('STANDARD', 'DELUXE', 'SUITE', 'PRESIDENTIAL', 'PENTHOUSE', 'VILLA') NOT NULL,
     check_in DATE NOT NULL,

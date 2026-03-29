@@ -84,12 +84,7 @@ public class ReservationServlet extends HttpServlet {
 
         switch (pathInfo) {
             case "/create":
-                if (currentUser == null) {
-                    System.err.println("Reservation Error: No user in session");
-                    response.sendRedirect(request.getContextPath() + "/login.jsp");
-                } else {
-                    createReservation(request, response, currentUser);
-                }
+                createReservation(request, response, currentUser);
                 break;
             case "/updateStatus":
                 updateStatus(request, response, currentUser);
@@ -175,6 +170,7 @@ public class ReservationServlet extends HttpServlet {
 
         try {
             String guestName = request.getParameter("guestName");
+            String guestEmail = request.getParameter("guestEmail");
             String address = request.getParameter("address");
             String contactNumber = request.getParameter("contactNumber");
             String roomType = request.getParameter("roomType");
@@ -203,8 +199,8 @@ public class ReservationServlet extends HttpServlet {
             }
 
             String result = reservationService.createReservation(
-                    currentUser.getId(), guestName, address, contactNumber,
-                    roomType, checkIn, checkOut, numGuests, specialRequests, currentUser.getEmail());
+                    currentUser.getId(), guestName, address, contactNumber, guestEmail,
+                    roomType, checkIn, checkOut, numGuests, specialRequests);
 
             if (result.startsWith("SUCCESS:")) {
                 String resNumber = result.split(":")[1];
@@ -249,16 +245,18 @@ public class ReservationServlet extends HttpServlet {
 
         int id = Integer.parseInt(request.getParameter("id"));
         String status = request.getParameter("status");
-
         Reservation res = reservationService.getById(id);
-        String userEmail = null;
+        
+        String targetEmail = null;
         if (res != null) {
-            User resUser = new com.oceanview.service.UserService().getUserById(res.getUserId());
-            if (resUser != null)
-                userEmail = resUser.getEmail();
+            targetEmail = res.getGuestEmail();
+            if (targetEmail == null || targetEmail.isEmpty()) {
+                User resUser = new com.oceanview.service.UserService().getUserById(res.getUserId());
+                if (resUser != null) targetEmail = resUser.getEmail();
+            }
         }
 
-        reservationService.updateStatus(id, status, userEmail);
+        reservationService.updateStatus(id, status, targetEmail);
         response.sendRedirect(request.getContextPath() + "/reservations/?success=Status updated");
     }
 
@@ -291,13 +289,14 @@ public class ReservationServlet extends HttpServlet {
         }
 
         int reservationId = Integer.parseInt(request.getParameter("id"));
-        Payment payment = paymentDAO.findByReservation(reservationId);
+        boolean success = reservationService.completePayment(reservationId);
 
-        if (payment != null) {
-            paymentDAO.updateStatus(payment.getId(), "COMPLETED");
-            response.sendRedirect(request.getContextPath() + "/reservations/bill?id=" + reservationId + "&success=Payment marked as completed");
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/reservations/bill?id=" + reservationId
+                    + "&success=Payment marked as completed and thank you email sent");
         } else {
-            response.sendRedirect(request.getContextPath() + "/reservations/bill?id=" + reservationId + "&error=Payment record not found");
+            response.sendRedirect(request.getContextPath() + "/reservations/bill?id=" + reservationId
+                    + "&error=Failed to process payment");
         }
     }
 

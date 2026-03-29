@@ -28,9 +28,9 @@ public class ReservationService {
     /**
      * Create a new reservation with automatic bill calculation.
      */
-    public String createReservation(int userId, String guestName, String address, String contactNumber,
+    public String createReservation(int userId, String guestName, String address, String contactNumber, String guestEmail,
             String roomType, Date checkIn, Date checkOut, int numGuests,
-            String specialRequests, String userEmail) {
+            String specialRequests) {
 
         System.out.println("DEBUG: ReservationService.createReservation for " + guestName + " (" + roomType + ")");
 
@@ -60,6 +60,7 @@ public class ReservationService {
                 .guestName(guestName)
                 .address(address)
                 .contactNumber(contactNumber)
+                .guestEmail(guestEmail)
                 .roomId(selectedRoom.getId())
                 .roomType(roomType)
                 .checkIn(checkIn)
@@ -77,7 +78,7 @@ public class ReservationService {
 
             // Send confirmation email
             try {
-                EmailUtil.sendBookingConfirmation(userEmail, guestName, reservation.getReservationNumber(),
+                EmailUtil.sendBookingConfirmation(guestEmail, guestName, reservation.getReservationNumber(),
                         roomType, checkIn.toString(), checkOut.toString(), totalAmount);
             } catch (Throwable t) {
                 System.err.println("Booking email failed: " + t.getMessage());
@@ -121,13 +122,57 @@ public class ReservationService {
     public boolean updateStatus(int reservationId, String status, String userEmail) {
         boolean updated = reservationDAO.updateStatus(reservationId, status);
 
-        if (updated && "CANCELLED".equals(status) && userEmail != null) {
+        if (updated && "CANCELLED".equals(status)) {
             Reservation res = reservationDAO.findById(reservationId);
             if (res != null) {
-                try {
-                    EmailUtil.sendCancellationNotice(userEmail, res.getGuestName(), res.getReservationNumber());
-                } catch (Exception e) {
-                    System.err.println("Cancellation email failed: " + e.getMessage());
+                String targetEmail = res.getGuestEmail();
+                if (targetEmail == null || targetEmail.isEmpty()) {
+                    targetEmail = userEmail;
+                }
+                
+                if (targetEmail != null && !targetEmail.isEmpty()) {
+                    try {
+                        EmailUtil.sendCancellationNotice(targetEmail, res.getGuestName(), res.getReservationNumber());
+                    } catch (Exception e) {
+                        System.err.println("Cancellation email failed: " + e.getMessage());
+                    }
+                }
+            }
+        }
+        return updated;
+    }
+
+    /**
+     * Complete payment and send success email.
+     */
+    public boolean completePayment(int reservationId) {
+        Payment payment = paymentDAO.findByReservation(reservationId);
+        if (payment == null)
+            return false;
+
+        boolean updated = paymentDAO.updateStatus(payment.getId(), "COMPLETED");
+
+        if (updated) {
+            Reservation res = reservationDAO.findById(reservationId);
+            if (res != null) {
+                String targetEmail = res.getGuestEmail();
+                if (targetEmail == null || targetEmail.isEmpty()) {
+                    com.oceanview.model.User user = new com.oceanview.service.UserService().getUserById(res.getUserId());
+                    if (user != null) {
+                        targetEmail = user.getEmail();
+                    }
+                }
+
+                if (targetEmail != null && !targetEmail.isEmpty()) {
+                    try {
+                        EmailUtil.sendPaymentSuccessEmail(
+                                targetEmail,
+                                res.getGuestName(),
+                                res.getReservationNumber(),
+                                payment.getTotal());
+                    } catch (Exception e) {
+                        System.err.println("Payment success email failed: " + e.getMessage());
+                    }
                 }
             }
         }

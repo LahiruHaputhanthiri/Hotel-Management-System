@@ -1,2 +1,16 @@
-﻿remote.txt
+# Build artifacts
+bin/
+target/
+*.log
+
+# IDE settings
+.settings/
+.vscode/
+.classpath
+.project
+
+# Temporary files
+full_git_status.txt
+git_status.txt
+remote.txt
 status.txt
